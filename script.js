@@ -2,6 +2,25 @@
 // Função para carregar os repositórios do GitHub do usuário
 async function loadRepos(username) {
 
+    // var username = document.getElementById("username").value;
+    // var selectRepo = document.getElementById("repoSelect");
+
+    // if (username.trim() !== "") {
+    //     // Mostra o select se o campo username estiver preenchido
+    //     selectRepo.style.display = "block";
+    //     // Aqui você pode adicionar a lógica para preencher o select com os repositórios do usuário
+
+    //     // Exemplo de como preencher o select com opções de repositórios (substitua pelo seu código real)
+    //     selectRepo.innerHTML = ""; // Limpa o select
+    //     var option = document.createElement("option");
+    //     option.text = "Repositório 1";
+    //     selectRepo.add(option);
+    //     // Adicione mais opções conforme necessário
+    // } else {
+    //     // Esconde o select se o campo username estiver vazio
+    //     selectRepo.style.display = "none";
+    // }
+
     try {
         const response = await fetch(`https://api.github.com/users/${username}/repos`)
         const repos = await response.json();
@@ -20,6 +39,8 @@ async function loadRepos(username) {
 }
 
 function displayTasks() {
+    const taskDescription = document.getElementById('taskDescription');
+    const taskDatetime = document.getElementById('taskDatetime');
     const taskList = document.getElementById('taskList');
     taskList.innerHTML = '';
 
@@ -36,7 +57,7 @@ function displayTasks() {
         listItem.appendChild(checkbox);
 
         const taskContent = document.createElement('span');
-        taskContent.textContent = task.content + ' - ' + task.repo;
+        taskContent.textContent = task.content + ' - ' + taskDescription.value + " - " + task.repo + ' - ' + taskDatetime.value;
         if (task.completed) {
             taskContent.classList.add('completed');
         }

@@ -12,13 +12,27 @@
 <body>
     <section class="container">
         <div>
-            <h1>Lista de tarefas - Github</h1>
-            <input type="text" id="username" placeholder="Nome de usuário" onblur="loadRepos()">
+            <h1>LISTA DE TAREFAS - GITHUB</h1>
         </div>
         <div>
             <div class="typetask">
-                <input type="text" id="taskInput" placeholder="Nova tarefa">
-                <select id="repoSelect">Selecione um repositório</select>
+                <label>
+                    <input type="text" id="taskInput" placeholder="Nova tarefa">
+                </label>
+                <label>
+                    <input type="text" id="taskDescription" placeholder="Descrição da tarefa">
+                </label>
+                <label>
+                    <input type="datetime-local" id="taskDatetime" placeholder="">
+                </label>
+                <label>
+                    <input type="text" id="username" placeholder="Nome de usuário github" onblur="loadRepos()">
+                </label>
+                <label>
+                    <select id="repoSelect">
+                        <option selected disabled>Selecione um repositório</option>
+                    </select>
+                </label>
                 <button onclick="addTask()">Adicionar Tarefa</button>
             </div>
 
