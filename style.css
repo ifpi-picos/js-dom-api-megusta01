@@ -1,0 +1,39 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.container {
+    border: 1px solid black;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.typetask{
+    padding: 20px;
+    
+}
+
+.completed {
+    text-decoration: line-through;
+}
