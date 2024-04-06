@@ -40,7 +40,17 @@ function createTaskListItem(task) {
     const taskContentWrapper = document.createElement('div');
     taskContentWrapper.classList.add('task-content-wrapper');
 
-    const taskContent = createElementWithClass('div', 'task-content', `${task.content} - ${task.datetime}`);
+    // Formatando a data e hora
+    const taskDateTime = new Date(task.datetime);
+    const formattedDateTime = taskDateTime.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const taskContent = createElementWithClass('div', 'task-content', `${task.content} - ${formattedDateTime}`);
     const taskDescription = createElementWithClass('div', 'task-description', task.description);
     const repoLink = createRepoLink(task);
     const completeButton = createButton('Concluído', 'complete-button', () => {
@@ -55,9 +65,6 @@ function createTaskListItem(task) {
 
     return listItem;
 }
-
-
-
 
 function createElementWithClass(elementType, className, textContent) {
     const element = document.createElement(elementType);
@@ -151,7 +158,6 @@ function updateTask(updatedTask) {
         }
     }
 }
-
 
 function removeTask(taskId) {
     let tasks = getTasksFromLocalStorage();
