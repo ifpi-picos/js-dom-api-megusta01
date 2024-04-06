@@ -10,37 +10,50 @@
 </head>
 
 <body>
-    <section class="container">
+    <header>
         <div>
             <h1>LISTA DE TAREFAS - GITHUB</h1>
         </div>
-        <div>
-            <div class="typetask">
-                <label>
-                    <input type="text" id="taskInput" placeholder="Nova tarefa">
-                </label>
-                <label>
-                    <input type="text" id="taskDescription" placeholder="Descrição da tarefa">
-                </label>
-                <label>
-                    <input type="datetime-local" id="taskDatetime" placeholder="">
-                </label>
-                <label>
-                    <input type="text" id="username" placeholder="Nome de usuário github" onblur="loadRepos(this.value)">
-                </label>
-                <label>
-                    <select id="repoSelect">
-                        <option selected disabled>Selecione um repositório</option>
-                    </select>
-                </label>
-                <button onclick="addTask()">Adicionar Tarefa</button>
-            </div>
+    </header>
+    <section class="container">
+        <div class="content">
+            <form id="taskForm">
+                <div class="typetask">
+                    <label>
+                        <p>Adicionar nova tarefa:</p>
+                        <input type="text" id="taskInput" name="taskInput" placeholder="Nova tarefa">
+                    </label>
+                    <label>
+                        <p>Descrição:</p>
+                        <input type="text" id="taskDescription" name="taskDescription" placeholder="Descrição da tarefa">
+                    </label>
+                    <label>
+                        <p>Data e hora:</p>
+                        <input type="datetime-local" id="taskDatetime" name="taskDatetime" placeholder="">
+                    </label>
+                    <fieldset class="repo">
+                        <legend>Repositório</legend>
+                        <input type="text" id="username" name="username" placeholder="Nome de usuário github">
+                        <select id="repoSelect" name="repoSelect">
+                            <option selected disabled>Selecione um repositório</option>
+                        </select>
+                    </fieldset>
+                    <button type="submit" class="addtask">Adicionar Tarefa</button>
+                </div>
+            </form>
 
             <div class="lista">
-                <ul id="taskList"></ul>
+                <div class="tarefas">
+                    <h3>Tarefas:</h3>
+                </div>
+                <div class="listatarefas">
+                    <ul id="taskList"></ul>
+                </div>                
             </div>
         </div>
     </section>
+
+    <script async src="script.js"></script>
 </body>
 
 </html>

@@ -1,128 +1,174 @@
-
 // Função para carregar os repositórios do GitHub do usuário
 async function loadRepos(username) {
-
-    // var username = document.getElementById("username").value;
-    // var selectRepo = document.getElementById("repoSelect");
-
-    // if (username.trim() !== "") {
-    //     // Mostra o select se o campo username estiver preenchido
-    //     selectRepo.style.display = "block";
-    //     // Aqui você pode adicionar a lógica para preencher o select com os repositórios do usuário
-
-    //     // Exemplo de como preencher o select com opções de repositórios (substitua pelo seu código real)
-    //     selectRepo.innerHTML = ""; // Limpa o select
-    //     var option = document.createElement("option");
-    //     option.text = "Repositório 1";
-    //     selectRepo.add(option);
-    //     // Adicione mais opções conforme necessário
-    // } else {
-    //     // Esconde o select se o campo username estiver vazio
-    //     selectRepo.style.display = "none";
-    // }
-
     try {
-        const response = await fetch(`https://api.github.com/users/${username}/repos`)
+        const response = await fetch(`https://api.github.com/users/${username}/repos`);
         const repos = await response.json();
-        console.log(repos)
         const repoSelect = document.getElementById('repoSelect');
         repoSelect.innerHTML = '';
         repos.forEach(repo => {
-            const option = document.createElement('option');
-            option.value = repo.name;
-            option.textContent = repo.name;
-            repoSelect.appendChild(option);
+            addOption(repoSelect, repo.name);
         });
     } catch (error) {
-        console.error('Erro ao carregar repositórios:', error);
+        handleLoadReposError(error);
     }
 }
 
+function handleLoadReposError(error) {
+    console.error('Erro ao carregar repositórios:', error);
+}
+
 function displayTasks() {
-    const taskDescription = document.getElementById('taskDescription');
-    const taskDatetime = document.getElementById('taskDatetime');
     const taskList = document.getElementById('taskList');
     taskList.innerHTML = '';
-
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const tasks = getTasksFromLocalStorage();
     tasks.forEach(task => {
-        const listItem = document.createElement('li');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = task.completed; // Marcar checkbox como concluído se a tarefa estiver marcada como concluída
-        checkbox.addEventListener('change', function() {
-            task.completed = this.checked;
-            updateTask(task);
-        });
-        listItem.appendChild(checkbox);
-
-        const taskContent = document.createElement('span');
-        taskContent.textContent = task.content + ' - ' + taskDescription.value + " - " + task.repo + ' - ' + taskDatetime.value;
-        if (task.completed) {
-            taskContent.classList.add('completed');
-        }
-        listItem.appendChild(taskContent);
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Remover';
-        deleteButton.addEventListener('click', function() {
-            removeTask(task.id);
-        });
-        listItem.appendChild(deleteButton);
-
+        const listItem = createTaskListItem(task);
         taskList.appendChild(listItem);
     });
 }
 
-// Função para adicionar uma nova tarefa
-function addTask() {
-    const taskInput = document.getElementById('taskInput');
-    const taskInputValue = taskInput.value.trim();
-    if (taskInputValue === '') return;
+function createTaskListItem(task) {
+    const listItem = document.createElement('li');
+    listItem.classList.add('task-item');
+    listItem.setAttribute('data-task-id', task.id);
+    listItem.classList.add(task.completed ? 'task-completed' : 'task-not-completed');
+
+    const taskInfo = document.createElement('div');
+    taskInfo.classList.add('task-info');
+    taskInfo.classList.add(task.completed ? 'task-completed' : 'task-not-completed');
+
+    const taskContentWrapper = document.createElement('div');
+    taskContentWrapper.classList.add('task-content-wrapper');
+
+    const taskContent = createElementWithClass('div', 'task-content', `${task.content} - ${task.datetime}`);
+    const taskDescription = createElementWithClass('div', 'task-description', task.description);
+    const repoLink = createRepoLink(task);
+    const completeButton = createButton('Concluído', 'complete-button', () => {
+        task.completed = !task.completed;
+        updateTask(task);
+    });
+    const removeButton = createButton('Remover', 'remove-button', () => removeTask(task.id));
+
+    taskContentWrapper.append(taskContent, taskDescription, repoLink);
+    taskInfo.append(taskContentWrapper);
+    listItem.append(taskInfo, completeButton, removeButton);
+
+    return listItem;
+}
+
+
+
+
+function createElementWithClass(elementType, className, textContent) {
+    const element = document.createElement(elementType);
+    element.classList.add(className);
+    element.textContent = textContent;
+    return element;
+}
+
+function createRepoLink(task) {
+    const repoLink = document.createElement('a');
+    repoLink.href = `https://github.com/${task.username}/${task.repo}`;
+    repoLink.textContent = task.repo;
+    repoLink.target = '_blank';
+    return repoLink;
+}
+
+function createButton(text, className, onClick) {
+    const button = document.createElement('button');
+    button.textContent = text;
+    button.classList.add(className);
+    button.addEventListener('click', onClick);
+    return button;
+}
+
+function addOption(selectElement, text) {
+    const option = document.createElement('option');
+    option.value = text;
+    option.textContent = text;
+    selectElement.appendChild(option);
+}
+
+function getTasksFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('tasks')) || [];
+}
+
+function saveTasksToLocalStorage(tasks) {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function addTask(event) {
+    event.preventDefault();
+    const taskInput = document.getElementById('taskInput').value.trim();
+    const taskDescription = document.getElementById('taskDescription').value.trim();
+    const taskDatetime = document.getElementById('taskDatetime').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const repoSelect = document.getElementById('repoSelect').value.trim();
+
+    if ([taskInput, taskDescription, taskDatetime, username, repoSelect].some(value => value === '')) {
+        alert('Por favor, preencha todos os campos');
+        return;
+    }
 
     const task = {
         id: Date.now(),
-        content: taskInputValue,
+        content: taskInput,
+        description: taskDescription,
+        datetime: taskDatetime,
+        username: username,
+        repo: repoSelect,
         completed: false,
-        repo: document.getElementById('repoSelect').value
     };
 
-    // Adicionar a tarefa ao armazenamento local
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const tasks = getTasksFromLocalStorage();
     tasks.push(task);
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    saveTasksToLocalStorage(tasks);
 
-    taskInput.value = '';
-    document.getElementById('repoSelect').selectedIndex = 0;
-
+    clearTaskForm();
     displayTasks();
+}
+
+function clearTaskForm() {
+    document.getElementById('taskInput').value = '';
+    document.getElementById('taskDescription').value = '';
+    document.getElementById('taskDatetime').value = '';
+    document.getElementById('username').value = '';
+    document.getElementById('repoSelect').selectedIndex = 0;
 }
 
 function updateTask(updatedTask) {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const tasks = getTasksFromLocalStorage();
     const index = tasks.findIndex(task => task.id === updatedTask.id);
     if (index !== -1) {
         tasks[index] = updatedTask;
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+        saveTasksToLocalStorage(tasks);
         displayTasks();
+        const taskListItem = document.querySelector(`[data-task-id="${updatedTask.id}"]`);
+        if (updatedTask.completed) {
+            taskListItem.classList.add('task-completed');
+        } else {
+            taskListItem.classList.remove('task-completed');
+        }
     }
 }
 
+
 function removeTask(taskId) {
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    let tasks = getTasksFromLocalStorage();
     tasks = tasks.filter(task => task.id !== taskId);
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    saveTasksToLocalStorage(tasks);
     displayTasks();
 }
 
+const taskForm = document.getElementById('taskForm');
+taskForm.addEventListener('submit', addTask);
+
 const usernameInput = document.getElementById('username');
-usernameInput.addEventListener('blur', function () {
-    const username = usernameInput.value;
-    if (username.trim() !== '') {
+usernameInput.addEventListener('blur', () => {
+    const username = usernameInput.value.trim();
+    if (username !== '') {
         loadRepos(username);
     }
 });
 
-window.addEventListener('load', function () {
-    displayTasks();
-});
+window.addEventListener('load', displayTasks);
